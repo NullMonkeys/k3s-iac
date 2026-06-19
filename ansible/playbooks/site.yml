@@ -1,0 +1,53 @@
+---
+- name: Pre-flight checks
+  hosts: all
+  gather_facts: false
+  run_once: true
+  tasks:
+    - name: Ensure at least one control plane node is defined
+      ansible.builtin.assert:
+        that:
+          - "'control_plane' in groups"
+          - "groups['control_plane'] | length > 0"
+        fail_msg: >-
+          Validation failed: No control plane nodes defined
+          Please define at least one host under the [control_plane.hosts]
+          group in hosts.toml
+
+    - name: Ensure Tailscale auth key is set
+      ansible.builtin.assert:
+        that:
+          - tailscale_authkey is defined
+          - tailscale_authkey | string | trim | length > 0
+          - tailscale_authkey != "tskey-auth-YOUR_KEY_HERE"
+        fail_msg: >-
+          Validation failed: tailscale_authkey is not set.
+          Define it in inventory/group_vars/all/secrets.yml (or your vaulted equivalent)
+
+    - name: Ensure k3s token is set
+      ansible.builtin.assert:
+        that:
+          - k3s_token is defined
+          - k3s_token | string | trim | length > 0
+        fail_msg: >-
+          Validation failed: k3s_token is not set.
+          Define it in inventory/group_vars/all/secrets.yml (or your vaulted equivalent)
+
+- name: Configure OS base
+  hosts: all
+  become: true
+  roles:
+    - common
+    - tailscale
+
+- name: Deploy k3s control plane
+  hosts: control_plane
+  become: true
+  roles:
+    - k3s_control_plane
+
+- name: Deploy k3s worker nodes
+  hosts: worker
+  become: true
+  roles:
+    - k3s_worker

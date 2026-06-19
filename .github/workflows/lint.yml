@@ -1,0 +1,42 @@
+name: Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform-checks:
+    name: Terraform Format and Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ">=1.15.0"
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform -chdir=terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform init
+        id: init
+        run: terraform -chdir=terraform init -backend=false
+
+      - name: Terraform validate
+        id: validate
+        run: terraform -chdir=terraform validate -no-color
+
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v25 # 26 have an issue with ansible.posix
+        with:
+          working_directory: "ansible"
+          requirements_file: "requirements.yml"

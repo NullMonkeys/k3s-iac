@@ -1,0 +1,41 @@
+---
+- name: Check if k3s is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/k3s
+  register: k3s_worker_k3s_installed
+
+- name: Get Tailscale IP
+  ansible.builtin.command: tailscale ip -4
+  register: k3s_worker_tailscale_ip
+  changed_when: false
+
+- name: Fail if no Tailscale IP found
+  ansible.builtin.assert:
+    that:
+      - k3s_worker_tailscale_ip.stdout_lines | length > 0
+    fail_msg: "No Tailscale IPv4 found on {{ inventory_hostname }}"
+
+- name: Set host Tailscale IPv4 fact
+  ansible.builtin.set_fact:
+    k3s_worker_tailscale_ipv4: "{{ k3s_worker_tailscale_ip.stdout_lines[0] | trim }}"
+
+- name: Download k3s install script
+  ansible.builtin.get_url:
+    url: https://get.k3s.io
+    dest: /tmp/k3s-install.sh
+    mode: "0755"
+  when: not k3s_worker_k3s_installed.stat.exists
+
+- name: Install k3s workers
+  ansible.builtin.command:
+    cmd: /bin/sh /tmp/k3s-install.sh
+    creates: /usr/local/bin/k3s
+  environment:
+    INSTALL_K3S_EXEC: >-
+      agent
+      --token={{ k3s_token }}
+      --server=https://{{ hostvars[groups['control_plane'][0]].k3s_control_plane_tailscale_ipv4 }}:6443
+      --node-ip={{ k3s_worker_tailscale_ipv4 }}
+      --flannel-iface=tailscale0
+      --vpn-auth=name=tailscale,joinKey={{ tailscale_authkey }}
+  when: not k3s_worker_k3s_installed.stat.exists

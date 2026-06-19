@@ -1,0 +1,98 @@
+---
+- name: Update apt cache and install packages
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    name:
+      - curl
+      - wget
+      - git
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - open-iscsi
+      - nfs-common
+    state: present
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Install baseline packages
+  ansible.builtin.dnf:
+    name:
+      - curl
+      - wget
+      - git
+      - iscsi-initiator-utils
+      - nfs-utils
+    state: present
+  when: ansible_facts['os_family'] == "RedHat"
+
+- name: Disable IPv6 via sysctl
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: "1"
+    sysctl_file: /etc/sysctl.d/99-disable-ipv6.conf
+    state: present
+    reload: true
+  loop:
+    - net.ipv6.conf.all.disable_ipv6
+    - net.ipv6.conf.default.disable_ipv6
+    - net.ipv6.conf.lo.disable_ipv6
+
+- name: Check if ipv6.disable=1 already in GRUB
+  ansible.builtin.command: grep -q 'ipv6\.disable=1' /etc/default/grub
+  register: common_grub_ipv6_check
+  failed_when: false
+  changed_when: false
+
+- name: Add ipv6.disable=1 to GRUB kernel cmdline
+  ansible.builtin.replace:
+    path: /etc/default/grub
+    regexp: '^(GRUB_CMDLINE_LINUX="[^"]*)"$'
+    replace: '\1 ipv6.disable=1"'
+  when: common_grub_ipv6_check.rc != 0
+  notify:
+    - Update GRUB Debian
+    - Update GRUB RedHat
+
+- name: Disable swap
+  ansible.builtin.command: swapoff -a
+  when: ansible_facts['swaptotal_mb'] > 0
+  changed_when: false
+
+- name: Remove swap from fstab
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^([^#\s]\S+\s+\S+\s+swap\s+.*)$'
+    replace: '# \1'
+
+- name: Create longhorn storage directory
+  ansible.builtin.file:
+    path: /var/lib/longhorn
+    state: directory
+    mode: "0755"
+
+- name: Create partition
+  community.general.parted:
+    device: /dev/sdb
+    number: 1
+    state: present
+    fs_type: ext4
+    align: optimal
+    part_start: "0%"
+    part_end: "100%"
+
+- name: Format new partition
+  community.general.filesystem:
+    dev: /dev/sdb1
+    fstype: ext4
+
+- name: Mount formatted partition
+  ansible.posix.mount:
+    path: /var/lib/longhorn
+    src: /dev/sdb1
+    fstype: ext4
+    opts: defaults
+    dump: "0"
+    passno: "2"
+    state: mounted
