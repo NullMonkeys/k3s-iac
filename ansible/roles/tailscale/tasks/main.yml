@@ -4,11 +4,19 @@
     path: /usr/bin/tailscale
   register: tailscale_installed
 
-- name: Install Tailscale from official script
-  ansible.builtin.shell: curl -fsSL https://tailscale.com/install.sh | sh
-  args:
-    executable: /bin/sh
+- name: Download Tailscale install script
+  ansible.builtin.get_url:
+    url: https://tailscale.com/install.sh
+    dest: /tmp/tailscale-install.sh
+    mode: "0755"
   when: not tailscale_installed.stat.exists
+
+- name: Install Tailscale from official script
+  ansible.builtin.command: /bin/sh /tmp/tailscale-install.sh
+  args:
+    creates: /usr/bin/tailscale
+  when: not tailscale_installed.stat.exists
+  changed_when: not tailscale_installed.stat.exists
 
 - name: Check Tailscale login status
   ansible.builtin.command: tailscale status
