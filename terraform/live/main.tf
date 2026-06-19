@@ -11,7 +11,7 @@ terraform {
   cloud {
     organization = "NullMonkeys"
     workspaces {
-      tags = ["k3s"]
+      project = "oci-k3s-cluster"
     }
   }
 }
