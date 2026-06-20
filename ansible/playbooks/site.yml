@@ -33,6 +33,24 @@
           Validation failed: k3s_token is not set.
           Define it in inventory/group_vars/all/secrets.yml (or your vaulted equivalent)
 
+    - name: Ensure Infisical Client ID is set
+      ansible.builtin.assert:
+        that:
+          - infisical_client_id is defined
+          - infisical_client_id | string | trim | length > 0
+        fail_msg: >-
+          Validation failed: infisical_client_id is not set.
+          Define it in inventory/group_vars/all/secrets.yml
+
+    - name: Ensure Infisical Client Secret is set
+      ansible.builtin.assert:
+        that:
+          - infisical_client_secret is defined
+          - infisical_client_secret | string | trim | length > 0
+        fail_msg: >-
+          Validation failed: infisical_client_secret is not set.
+          Define it in inventory/group_vars/all/secrets.yml
+
 - name: Configure OS base
   hosts: all
   become: true
@@ -51,3 +69,9 @@
   become: true
   roles:
     - k3s_worker
+
+- name: Deploy argocd
+  hosts: control_plane[0]
+  become: true
+  roles:
+    - argocd

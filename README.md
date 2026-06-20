@@ -1,4 +1,4 @@
-Cross-region k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraform (HCP) and configured with Ansible.
+Cross-region k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraform (HCP), configured with Ansible, and managed via ArgoCD.
 
 > **Disclaimer:** This is an internal setup. It requires HCP Terraform and manual Ansible inventory management. You probably shouldn't use it :)
 
@@ -6,6 +6,8 @@ Cross-region k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraf
 
 - **Terraform** provisions OCI network (VCN, subnet, security list) and compute instances (control plane + workers) with attached block volumes for Longhorn.
 - **Ansible** installs Tailscale (overlay mesh), then deploys k3s — control plane first (HA via `--cluster-init`), followed by workers. All node-to-node traffic goes over Tailscale (`flannel-iface=tailscale0`).
+- **Infisical** injects Universal Auth credentials as a Kubernetes secret for the Infisical Operator.
+- **ArgoCD** is bootstrapped on the first control plane node using the [k3s-gitops](https://github.com/NullMonkeys/k3s-gitops) repository (app-of-apps pattern), pulling the GitOps repo, applying the ArgoCD manifests, and deploying the root application.
 - **Longhorn** block volumes are attached but must be configured in-cluster after bootstrap.
 
 ## Prerequisites
@@ -13,7 +15,8 @@ Cross-region k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraf
 - [HCP Terraform](https://app.terraform.io) account
 - [Oracle Cloud](https://cloud.oracle.com) account(s)
 - [Tailscale](https://tailscale.com) account and pre-generated reusable auth key
-- Ansible 2.15+ (`ansible.posix`, `community.general`)
+- [Infisical](https://infisical.com) Client ID and Client Secret for Universal Auth
+- Ansible 2.21+ (`ansible.posix`, `community.general`, `kubernetes.core`)
 
 ## Project structure
 
@@ -24,19 +27,32 @@ Cross-region k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraf
 │       ├── oci-network/         # VCN, subnet, security list
 │       └── oci-compute/         # Instances + Longhorn volumes
 ├── ansible/
+│   ├── ansible.cfg              # Ansible configuration (SSH key, plugins)
 │   ├── inventory/
-│   │   ├── hosts.toml           # Manual IP assignments
+│   │   ├── hosts.toml
 │   │   └── group_vars/all/
 │   │       └── secrets.yml.example
 │   ├── playbooks/
 │   │   └── site.yml             # Main playbook
+│   ├── requirements.yml         # Ansible collection dependencies
 │   └── roles/
 │       ├── common/              # OS deps, disable IPv6/swap, mount Longhorn
 │       ├── tailscale/           # Install & auth to Tailscale
 │       ├── k3s_control_plane/   # Bootstrap/join control plane
-│       └── k3s_worker/          # Join workers
+│       ├── k3s_worker/          # Join workers
+│       └── argocd/              # Bootstrap ArgoCD + Infisical secrets
 └── .github/workflows/lint.yml   # CI: Terraform fmt/validate + ansible-lint
 ```
+
+## Secrets
+
+Required variables in `ansible/inventory/group_vars/all/secrets.yml`:
+
+| Variable | Description |
+|---|---|
+| `k3s_token` | Shared k3s cluster token |
+| `infisical_client_id` | Infisical Universal Auth client ID |
+| `infisical_client_secret` | Infisical Universal Auth client secret |
 
 ## CI
 
