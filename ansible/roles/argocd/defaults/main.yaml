@@ -4,6 +4,6 @@ argocd_gitops_repo_branch: "main"
 argocd_gitops_repo_tmp_path: "/tmp/k3s-gitops"
 
 argocd_kustomize_path: "infrastructure/argocd"
-argocd_root_app_path: "bootstrap/root-app.yml"
+argocd_root_app_path: "bootstrap/root-app.yaml"
 
 argocd_kubeconfig_path: "/etc/rancher/k3s/k3s.yaml"

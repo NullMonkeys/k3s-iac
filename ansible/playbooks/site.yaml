@@ -22,7 +22,7 @@
           - tailscale_authkey != "tskey-auth-YOUR_KEY_HERE"
         fail_msg: >-
           Validation failed: tailscale_authkey is not set.
-          Define it in inventory/group_vars/all/secrets.yml (or your vaulted equivalent)
+          Define it in inventory/group_vars/all/secrets.yaml (or your vaulted equivalent)
 
     - name: Ensure k3s token is set
       ansible.builtin.assert:
@@ -31,7 +31,7 @@
           - k3s_token | string | trim | length > 0
         fail_msg: >-
           Validation failed: k3s_token is not set.
-          Define it in inventory/group_vars/all/secrets.yml (or your vaulted equivalent)
+          Define it in inventory/group_vars/all/secrets.yaml (or your vaulted equivalent)
 
     - name: Ensure Infisical Client ID is set
       ansible.builtin.assert:
@@ -40,7 +40,7 @@
           - infisical_client_id | string | trim | length > 0
         fail_msg: >-
           Validation failed: infisical_client_id is not set.
-          Define it in inventory/group_vars/all/secrets.yml
+          Define it in inventory/group_vars/all/secrets.yaml
 
     - name: Ensure Infisical Client Secret is set
       ansible.builtin.assert:
@@ -49,7 +49,7 @@
           - infisical_client_secret | string | trim | length > 0
         fail_msg: >-
           Validation failed: infisical_client_secret is not set.
-          Define it in inventory/group_vars/all/secrets.yml
+          Define it in inventory/group_vars/all/secrets.yaml
 
 - name: Configure OS base
   hosts: all

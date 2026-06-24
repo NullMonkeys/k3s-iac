@@ -25,4 +25,4 @@ terraform.rc
 # Ansible
 *.retry
 .ansible/
-ansible/inventory/group_vars/all/secrets.yml
+ansible/inventory/group_vars/all/secrets.yaml

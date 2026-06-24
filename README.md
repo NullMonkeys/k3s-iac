@@ -31,22 +31,22 @@ Cross-region k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraf
 │   ├── inventory/
 │   │   ├── hosts.toml
 │   │   └── group_vars/all/
-│   │       └── secrets.yml.example
+│   │       └── secrets.yaml.example
 │   ├── playbooks/
-│   │   └── site.yml             # Main playbook
-│   ├── requirements.yml         # Ansible collection dependencies
+│   │   └── site.yaml             # Main playbook
+│   ├── requirements.yaml         # Ansible collection dependencies
 │   └── roles/
 │       ├── common/              # OS deps, disable IPv6/swap, mount Longhorn
 │       ├── tailscale/           # Install & auth to Tailscale
 │       ├── k3s_control_plane/   # Bootstrap/join control plane
 │       ├── k3s_worker/          # Join workers
 │       └── argocd/              # Bootstrap ArgoCD + Infisical secrets
-└── .github/workflows/lint.yml   # CI: Terraform fmt/validate + ansible-lint
+└── .github/workflows/lint.yaml   # CI: Terraform fmt/validate + ansible-lint
 ```
 
 ## Secrets
 
-Required variables in `ansible/inventory/group_vars/all/secrets.yml`:
+Required variables in `ansible/inventory/group_vars/all/secrets.yaml`:
 
 | Variable | Description |
 |---|---|
