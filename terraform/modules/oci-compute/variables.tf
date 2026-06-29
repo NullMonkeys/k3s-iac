@@ -58,6 +58,11 @@ variable "node_boot_volume_size_in_gbs" {
   type        = number
   description = "Boot volume size in GB for the compute instance"
   default     = 50
+
+  validation {
+    condition     = var.node_boot_volume_size_in_gbs >= 50
+    error_message = "Boot volume size must be at least 50 GB"
+  }
 }
 
 variable "node_longhorn_volume_size_in_gbs" {

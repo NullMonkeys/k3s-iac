@@ -33,3 +33,12 @@
   ansible.builtin.command: tailscale set --accept-routes --accept-dns=false
   when: tailscale_status.rc == 0
   changed_when: true
+
+- name: Enable IPv4 forwarding for Tailscale subnet routing
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_file: /etc/sysctl.d/99-tailscale.conf
+    state: present
+    reload: yes
+  notify: Restart tailscaled

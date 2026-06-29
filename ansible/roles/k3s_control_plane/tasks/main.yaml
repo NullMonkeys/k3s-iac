@@ -39,6 +39,7 @@
       --node-external-ip={{ k3s_control_plane_tailscale_ipv4 }}
       --flannel-iface=tailscale0
       --vpn-auth=name=tailscale,joinKey={{ tailscale_authkey }}
+      --etcd-expose-metrics=true
   when:
     - not k3s_control_plane_k3s_installed.stat.exists
     - inventory_hostname == groups['control_plane'][0]
@@ -67,6 +68,7 @@
       --node-external-ip={{ k3s_control_plane_tailscale_ipv4 }}
       --flannel-iface=tailscale0
       --vpn-auth=name=tailscale,joinKey={{ tailscale_authkey }}
+      --etcd-expose-metrics=true
   when:
     - not k3s_control_plane_k3s_installed.stat.exists
     - inventory_hostname != groups['control_plane'][0]

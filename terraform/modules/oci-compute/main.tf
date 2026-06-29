@@ -56,7 +56,7 @@ resource "oci_core_volume" "longhorn_volume" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
-  count        = var.node_count
+  count        = var.node_longhorn_volume_size_in_gbs > 50 ? var.node_count : 0
   size_in_gbs  = var.node_longhorn_volume_size_in_gbs
   display_name = "${var.node_name_prefix}-${count.index + 1}-longhorn"
 }
@@ -65,6 +65,6 @@ resource "oci_core_volume_attachment" "longhorn_volume_attachment" {
   instance_id = oci_core_instance.instance[count.index].id
   volume_id   = oci_core_volume.longhorn_volume[count.index].id
 
-  count           = var.node_count
+  count           = var.node_longhorn_volume_size_in_gbs > 50 ? var.node_count : 0
   attachment_type = "PARAVIRTUALIZED"
 }
