@@ -1,11 +1,12 @@
-Cross-region k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraform (HCP), configured with Ansible, and managed via ArgoCD.
+Multi-node k3s cluster on Oracle Cloud Infrastructure, provisioned with Terraform (HCP), configured with Ansible, and managed via ArgoCD.
 
-> **Disclaimer:** This is an internal setup. It requires HCP Terraform and manual Ansible inventory management. You probably shouldn't use it :)
+> [!NOTE]
+> This is our internal setup. It requires HCP Terraform and manual Ansible inventory management. You probably shouldn't use it :)
 
 ## Architecture
 
 - **Terraform** provisions OCI network (VCN, subnet, security list) and compute instances (control plane + workers) with attached block volumes for Longhorn.
-- **Ansible** installs Tailscale (overlay mesh), then deploys k3s — control plane first (HA via `--cluster-init`), followed by workers. All node-to-node traffic goes over Tailscale (`flannel-iface=tailscale0`).
+- **Ansible** installs Tailscale (overlay mesh), then deploys k3s - control plane first (HA via `--cluster-init`), followed by workers. All node-to-node traffic goes over Tailscale (`flannel-iface=tailscale0`).
 - **Infisical** injects Universal Auth credentials as a Kubernetes secret for the Infisical Operator.
 - **ArgoCD** is bootstrapped on the first control plane node using the [k3s-gitops](https://github.com/NullMonkeys/k3s-gitops) repository (app-of-apps pattern), pulling the GitOps repo, applying the ArgoCD manifests, and deploying the root application.
 - **Longhorn** block volumes are attached but must be configured in-cluster after bootstrap.
@@ -60,4 +61,4 @@ Pull requests run `terraform fmt -check`, `terraform validate`, and `ansible-lin
 
 ## License
 
-Apache 2.0 — see [LICENSE](LICENSE)
+MIT - see [LICENSE](LICENSE)
