@@ -13,17 +13,6 @@ data "oci_identity_availability_domains" "ads" {
   compartment_id = var.compartment_id
 }
 
-data "oci_core_images" "images" {
-  compartment_id = var.compartment_id
-
-  operating_system         = var.operating_system
-  operating_system_version = var.operating_system_version
-  shape                    = var.node_shape
-
-  sort_by    = "TIMECREATED"
-  sort_order = "DESC"
-}
-
 resource "oci_core_instance" "instance" {
   compartment_id      = var.compartment_id
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
@@ -45,7 +34,7 @@ resource "oci_core_instance" "instance" {
 
   source_details {
     source_type             = "image"
-    source_id               = data.oci_core_images.images.images[0].id
+    source_id               = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaal4itgbo25fulz7jbwyjdk2qc775l4npiqraf44ac62pf4iqfddsa"
     boot_volume_size_in_gbs = var.node_boot_volume_size_in_gbs
   }
 
