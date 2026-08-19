@@ -48,16 +48,10 @@ variable "vcn_dns_label" {
   default     = "k3s"
 }
 
-variable "operating_system" {
+variable "operating_system_image_id" {
   type        = string
-  description = "Name of the operating system to use for compute instances"
-  default     = "Canonical Ubuntu"
-}
-
-variable "operating_system_version" {
-  type        = string
-  description = "Version of the operating system to use for compute instances"
-  default     = "24.04"
+  default     = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaal4itgbo25fulz7jbwyjdk2qc775l4npiqraf44ac62pf4iqfddsa"
+  description = "OCID of the operating system image to use for compute instances. Defaults to Canonical Ubuntu 24.04 (Frankfurt-1)"
 }
 
 variable "control_plane_count" {

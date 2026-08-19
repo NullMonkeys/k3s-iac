@@ -14,8 +14,9 @@ variable "ssh_public_key" {
 }
 
 variable "operating_system_image_id" {
-  type    = string
-  default = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaal4itgbo25fulz7jbwyjdk2qc775l4npiqraf44ac62pf4iqfddsa" # ubuntu 24.04
+  type        = string
+  default     = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaal4itgbo25fulz7jbwyjdk2qc775l4npiqraf44ac62pf4iqfddsa"
+  description = "OCID of the operating system image to use for compute instances. Defaults to Canonical Ubuntu 24.04 (Frankfurt-1)"
 }
 
 variable "node_shape" {
