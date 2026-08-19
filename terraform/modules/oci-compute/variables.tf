@@ -13,16 +13,9 @@ variable "ssh_public_key" {
   description = "Public SSH key for the compute instance"
 }
 
-variable "operating_system" {
-  type        = string
-  description = "Name of the operating system to use for the compute instance"
-  default     = "Canonical Ubuntu"
-}
-
-variable "operating_system_version" {
-  type        = string
-  description = "Version of the operating system to use for the compute instance"
-  default     = "24.04"
+variable "operating_system_image_id" {
+  type    = string
+  default = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaal4itgbo25fulz7jbwyjdk2qc775l4npiqraf44ac62pf4iqfddsa" # ubuntu 24.04
 }
 
 variable "node_shape" {
