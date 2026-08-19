@@ -45,13 +45,13 @@ variable "node_name_prefix" {
 variable "node_ocpus" {
   type        = number
   description = "Number of OCPUs for the compute instance"
-  default     = 4
+  default     = 2
 }
 
 variable "node_memory_in_gbs" {
   type        = number
   description = "Memory in GB for the compute instance"
-  default     = 24
+  default     = 12
 }
 
 variable "node_boot_volume_size_in_gbs" {
