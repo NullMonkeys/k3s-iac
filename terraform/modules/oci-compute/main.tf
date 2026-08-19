@@ -34,7 +34,7 @@ resource "oci_core_instance" "instance" {
 
   source_details {
     source_type             = "image"
-    source_id               = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaal4itgbo25fulz7jbwyjdk2qc775l4npiqraf44ac62pf4iqfddsa"
+    source_id               = var.operating_system_image_id
     boot_volume_size_in_gbs = var.node_boot_volume_size_in_gbs
   }
 

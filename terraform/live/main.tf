@@ -40,8 +40,7 @@ module "control-plane" {
   subnet_id      = module.network.subnet_id
 
   ssh_public_key                   = var.ssh_public_key
-  operating_system                 = var.operating_system
-  operating_system_version         = var.operating_system_version
+  operating_system_image_id        = var.operating_system_image_id
   node_shape                       = var.node_shape
   node_count                       = var.control_plane_count
   node_name_prefix                 = "${var.node_name_prefix}-control-plane"
@@ -58,8 +57,7 @@ module "workers" {
   subnet_id      = module.network.subnet_id
 
   ssh_public_key                   = var.ssh_public_key
-  operating_system                 = var.operating_system
-  operating_system_version         = var.operating_system_version
+  operating_system_image_id        = var.operating_system_image_id
   node_shape                       = var.node_shape
   node_count                       = var.worker_count
   node_name_prefix                 = "${var.node_name_prefix}-worker"
