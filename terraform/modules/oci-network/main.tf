@@ -90,8 +90,17 @@ resource "oci_core_default_security_list" "security_list" {
     protocol = "6"
     source   = "0.0.0.0/0"
     tcp_options {
-      min = 25565
-      max = 25565
+      min = 30000
+      max = 32767
+    }
+  }
+
+  ingress_security_rules {
+    protocol = "17"
+    source   = "0.0.0.0/0"
+    tcp_options {
+      min = 30000
+      max = 32767
     }
   }
 }
