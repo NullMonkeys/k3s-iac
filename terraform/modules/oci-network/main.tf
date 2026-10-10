@@ -98,7 +98,7 @@ resource "oci_core_default_security_list" "security_list" {
   ingress_security_rules {
     protocol = "17"
     source   = "0.0.0.0/0"
-    tcp_options {
+    udp_options {
       min = 30000
       max = 32767
     }
